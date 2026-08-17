@@ -44,8 +44,8 @@ export function useYouTubePlayer({
     function createPlayer() {
       if (cancelled || !containerRef.current || playerRef.current) return;
       playerRef.current = new window.YT.Player(containerRef.current, {
-        height: "0",
-        width: "0",
+        height: "1",
+        width: "1",
         videoId: currentVideoIdRef.current,
         playerVars: {
           controls: 0,
