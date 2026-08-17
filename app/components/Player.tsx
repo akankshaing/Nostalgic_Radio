@@ -132,10 +132,17 @@ export function Player() {
     <div className="pointer-events-auto w-full max-w-xl px-4">
       {/* Hidden YouTube iframe target */}
       <div
-        ref={containerRef}
-        className="hidden"
-        aria-hidden="true"
-      />
+  ref={containerRef}
+  style={{
+    position: "fixed",
+    width: 1,
+    height: 1,
+    opacity: 0,
+    pointerEvents: "none",
+    overflow: "hidden",
+  }}
+  aria-hidden="true"
+/>
 
       {/* =========================================================
           DESKTOP PLAYER
