@@ -6,7 +6,7 @@ const links = [
   },
   {
     label: "LinkedIn",
-    href: "https://www.linkedin.com/in/akanksha-singh/",
+    href: "https://www.linkedin.com/in/akankshasingh65/",
     path: "M6.94 8.5H3.56V20h3.38V8.5ZM5.25 3A1.98 1.98 0 1 0 5.25 7a1.98 1.98 0 0 0 0-4ZM20.44 13.41c0-3.46-1.85-5.07-4.32-5.07-1.99 0-2.88 1.1-3.38 1.87V8.5H9.36V20h3.38v-6.41c0-1.69.32-3.35 2.43-3.35 2.08 0 2.1 1.96 2.1 3.46V20h3.37v-6.59Z",
   },
   {
