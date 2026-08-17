@@ -16,6 +16,7 @@ export function Player() {
   const [shuffle, setShuffle] = useState(false);
   const [showAllSongs, setShowAllSongs] = useState(false);
   const [blocked, setBlocked] = useState(false);
+
   const historyRef = useRef<number[]>([]);
   const brokenStreakRef = useRef(0);
 
@@ -24,12 +25,21 @@ export function Player() {
   const goNext = useCallback(() => {
     setIndex((prev) => {
       historyRef.current.push(prev);
-      if (tracks.length <= 1) return prev;
+
+      if (tracks.length <= 1) {
+        return prev;
+      }
+
       if (shuffle) {
         let next = prev;
-        while (next === prev) next = Math.floor(Math.random() * tracks.length);
+
+        while (next === prev) {
+          next = Math.floor(Math.random() * tracks.length);
+        }
+
         return next;
       }
+
       return (prev + 1) % tracks.length;
     });
   }, [shuffle]);
@@ -39,16 +49,21 @@ export function Player() {
       if (shuffle && historyRef.current.length > 0) {
         return historyRef.current.pop()!;
       }
+
       return (prev - 1 + tracks.length) % tracks.length;
     });
   }, [shuffle]);
 
   const playTrack = useCallback((i: number) => {
     setIndex((prev) => {
-      if (i === prev) return prev;
+      if (i === prev) {
+        return prev;
+      }
+
       historyRef.current.push(prev);
       return i;
     });
+
     brokenStreakRef.current = 0;
     setBlocked(false);
     setShowAllSongs(false);
@@ -61,12 +76,14 @@ export function Player() {
 
   const handleError = useCallback(() => {
     brokenStreakRef.current += 1;
-    // If we've skipped through the whole playlist without landing on a
-    // playable track, stop instead of spinning forever.
+
+    // Stop after checking the entire playlist
+    // without finding a playable track.
     if (brokenStreakRef.current > tracks.length) {
       setBlocked(true);
       return;
     }
+
     goNext();
   }, [goNext]);
 
@@ -86,7 +103,9 @@ export function Player() {
   });
 
   useEffect(() => {
-    if (isPlaying) brokenStreakRef.current = 0;
+    if (isPlaying) {
+      brokenStreakRef.current = 0;
+    }
   }, [isPlaying]);
 
   const handleManualNext = useCallback(() => {
@@ -102,23 +121,36 @@ export function Player() {
   }, [goPrev]);
 
   const toggle = useCallback(() => {
-    if (isPlaying) pause();
-    else play();
+    if (isPlaying) {
+      pause();
+    } else {
+      play();
+    }
   }, [isPlaying, play, pause]);
 
   return (
     <div className="pointer-events-auto w-full max-w-xl px-4">
-      {/* hidden YouTube iframe target — renders no visible UI, audio only */}
-      <div ref={containerRef} className="hidden" aria-hidden="true" />
+      {/* Hidden YouTube iframe target */}
+      <div
+        ref={containerRef}
+        className="hidden"
+        aria-hidden="true"
+      />
 
-      {/* ---------- Desktop: horizontal glass pill ---------- */}
+      {/* =========================================================
+          DESKTOP PLAYER
+          ========================================================= */}
       <div className="glass hidden w-full items-center gap-3 rounded-full p-3 pr-4 sm:flex">
-        <Vinyl isPlaying={isPlaying} size={80} />
+        <Vinyl
+          isPlaying={isPlaying}
+          size={80}
+        />
 
         <div className="min-w-0 flex-1">
           <p className="truncate text-[15px] font-semibold text-[var(--color-ink)]">
             {track.title}
           </p>
+
           <p className="truncate text-[12.5px] text-[var(--color-ink)]/78">
             {blocked
               ? "No playable track found in this playlist"
@@ -131,52 +163,88 @@ export function Player() {
             <span className="tabular text-[10.5px] text-[var(--color-ink)]/70">
               {formatTime(currentTime)}
             </span>
-            <SeekBar currentTime={currentTime} duration={duration} onSeek={seekTo} />
+
+            <SeekBar
+              currentTime={currentTime}
+              duration={duration}
+              onSeek={seekTo}
+            />
+
             <span className="tabular text-[10.5px] text-[var(--color-ink)]/70">
               {formatTime(duration)}
             </span>
           </div>
         </div>
 
-        <ShuffleButton active={shuffle} onToggle={toggleShuffle} />
+        <ShuffleButton
+          active={shuffle}
+          onToggle={toggleShuffle}
+        />
+
         <Transport
           isPlaying={isPlaying}
           onPrev={handleManualPrev}
           onToggle={toggle}
           onNext={handleManualNext}
         />
-        <AllSongsButton onClick={() => setShowAllSongs(true)} />
+
+        <AllSongsButton
+          onClick={() => setShowAllSongs(true)}
+        />
       </div>
 
-      {/* ---------- Mobile: stacked card ---------- */}
-      <div className="glass flex w-full flex-col items-center gap-3 rounded-3xl p-5 sm:hidden">
-        <Vinyl isPlaying={isPlaying} size={104} />
+      {/* =========================================================
+          MOBILE PLAYER
+          Compact horizontal layout
+          ========================================================= */}
+      <div className="glass flex w-full flex-col gap-2 rounded-2xl p-3 sm:hidden">
+        {/* Track information */}
+        <div className="flex w-full items-center gap-3">
+          <Vinyl
+            isPlaying={isPlaying}
+            size={64}
+          />
 
-        <div className="w-full text-center">
-          <p className="truncate text-[16px] font-semibold text-[var(--color-ink)]">
-            {track.title}
-          </p>
-          <p className="truncate text-[13px] text-[var(--color-ink)]/78">
-            {blocked
-              ? "No playable track found in this playlist"
-              : errored
-                ? "Unavailable — skipping…"
-                : track.artist}
-          </p>
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-[14px] font-semibold text-[var(--color-ink)]">
+              {track.title}
+            </p>
+
+            <p className="truncate text-[11.5px] text-[var(--color-ink)]/78">
+              {blocked
+                ? "No playable track found in this playlist"
+                : errored
+                  ? "Unavailable — skipping…"
+                  : track.artist}
+            </p>
+
+            {/* Seek bar */}
+            <div className="mt-1 flex w-full items-center gap-1.5">
+              <span className="tabular shrink-0 text-[9px] text-[var(--color-ink)]/70">
+                {formatTime(currentTime)}
+              </span>
+
+              <SeekBar
+                currentTime={currentTime}
+                duration={duration}
+                onSeek={seekTo}
+              />
+
+              <span className="tabular shrink-0 text-[9px] text-[var(--color-ink)]/70">
+                {formatTime(duration)}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="flex w-full items-center gap-2">
-          <span className="tabular text-[10.5px] text-[var(--color-ink)]/70">
-            {formatTime(currentTime)}
-          </span>
-          <SeekBar currentTime={currentTime} duration={duration} onSeek={seekTo} />
-          <span className="tabular text-[10.5px] text-[var(--color-ink)]/70">
-            {formatTime(duration)}
-          </span>
-        </div>
+        {/* Controls */}
+        <div className="flex items-center justify-center gap-2">
+          <ShuffleButton
+            active={shuffle}
+            onToggle={toggleShuffle}
+            size="lg"
+          />
 
-        <div className="flex items-center gap-3">
-          <ShuffleButton active={shuffle} onToggle={toggleShuffle} size="lg" />
           <Transport
             isPlaying={isPlaying}
             onPrev={handleManualPrev}
@@ -184,10 +252,17 @@ export function Player() {
             onNext={handleManualNext}
             size="lg"
           />
-          <AllSongsButton onClick={() => setShowAllSongs(true)} size="lg" />
+
+          <AllSongsButton
+            onClick={() => setShowAllSongs(true)}
+            size="lg"
+          />
         </div>
       </div>
 
+      {/* =========================================================
+          ALL SONGS PANEL
+          ========================================================= */}
       {showAllSongs && (
         <AllSongsPanel
           currentIndex={index}
