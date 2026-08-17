@@ -41,9 +41,9 @@ export function SocialLinks() {
         </a>
       ))}
 
-      <span className="ml-1 text-[11px] font-medium text-[var(--color-ink)]/60 [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">
+      {/* <span className="ml-1 text-[11px] font-medium text-[var(--color-ink)]/60 [text-shadow:0_1px_4px_rgba(0,0,0,0.5)]">
         by Akanksha Singh
-      </span>
+      </span> */}
     </div>
   );
 }
